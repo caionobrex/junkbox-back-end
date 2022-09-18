@@ -9,3 +9,79 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+enum PlayListType {
+  CASUAL
+  BUSINESS
+}
+
+model User {
+  id                  Int       @default(autoincrement()) @id
+  email               String    @unique
+  name                String    @unique
+  avatar              String?
+  ip                  String?
+  password            String
+  resetPasswordCode   String?
+  playlists           PlayList[]
+  addedSongs          Song[]
+  allowDedication     Boolean   @default(true)
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @default(now())
+}
+
+model PlayList {
+  id                  Int       @default(autoincrement()) @id
+  externalId          String
+  image               String?
+  name                String
+  type                PlayListType?
+  maxLength           Int?
+  repeat              Boolean   @default(true)
+  songsPerUser        Int?
+  description         String?
+  songs               Song[]
+  user                User?     @relation(fields: [userId], references: [id])
+  userId              Int?
+  address             Address?
+  password            String?
+  blockedWords        BlockedWord[]
+  lifetime            DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @default(now())
+}
+
+model Song {
+  id                  Int       @default(autoincrement()) @id
+  externalId          String
+  name                String
+  position            Int
+  duration            Int
+  upvoteCount         Int       @default(0)
+  playlist            PlayList? @relation(fields: [playlistId], references: [id])
+  playlistId          Int?
+  user                User?     @relation(fields: [userId], references: [id])
+  userId              Int?
+  toUser              String
+  anonymous           Boolean   @default(false)
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @default(now())
+}
+
+model BlockedWord {
+  id          Int       @default(autoincrement()) @id
+  word        String
+  playlist    PlayList? @relation(fields: [playlistId], references: [id])
+  playlistId  Int?
+}
+
+model Address {
+  id        Int      @default(autoincrement()) @id
+  street    String?
+  district  String?
+  state     String?
+  city      String?
+  country   String?
+  playlist  PlayList @relation(fields: [addressId], references: [id])
+  addressId Int      @unique
+}
