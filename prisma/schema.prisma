@@ -58,9 +58,9 @@ model Song {
   position            Int
   duration            Int
   upvoteCount         Int       @default(0)
-  playlist            PlayList? @relation(fields: [playlistId], references: [id])
+  playlist            PlayList? @relation(fields: [playlistId], references: [id], onDelete: Cascade)
   playlistId          Int?
-  user                User?     @relation(fields: [userId], references: [id])
+  user                User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId              Int?
   toUser              String
   anonymous           Boolean   @default(false)
