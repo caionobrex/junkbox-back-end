@@ -12,7 +12,7 @@ import { PlayList, PlayListType } from '@prisma/client';
 import { CreateNewPlaylistService } from '../providers/services/create-new-playlist.service';
 import { DeletePlaylistByIdService } from '../providers/services/delete-playlist.service';
 import { FindAllPlaylistsService } from '../providers/services/find-all-playlists.service';
-import { FindPlaylistById } from '../providers/services/find-play-list-by-id';
+import { FindPlaylistById } from '../providers/services/find-playlist-by-id';
 
 @Controller('playlists')
 export class PlayListsController {
