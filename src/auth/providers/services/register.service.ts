@@ -6,12 +6,18 @@ import * as bcrypt from 'bcrypt';
 export class RegisterService {
   constructor(private readonly createUserService: CreateUserService) {}
 
-  async execute(email: string, username: string, password: string) {
+  async execute(
+    email: string,
+    username: string,
+    password: string,
+    ip?: string,
+  ) {
     try {
       await this.createUserService.execute({
         email,
         name: username,
         password: await bcrypt.hash(password, 8),
+        ip,
       });
     } catch (err) {
       throw err;

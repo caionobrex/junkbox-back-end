@@ -5,6 +5,7 @@ import {
   Request,
   Body,
   BadRequestException,
+  Ip,
 } from '@nestjs/common';
 import { LocalAuthGuard } from '../guards/local-auth.guard';
 import { LoginService } from '../providers/services/login.service';
@@ -26,15 +27,16 @@ export class AuthController {
   }
 
   @Post('register')
-  register(@Body() body) {
+  async register(@Body() body, @Ip() ip) {
     try {
-      return this.registerService.execute(
+      return await this.registerService.execute(
         body.email,
         body.username,
         body.password,
+        ip,
       );
     } catch (err) {
-      throw new BadRequestException('Source already exists.');
+      throw new BadRequestException(err.message);
     }
   }
 }
