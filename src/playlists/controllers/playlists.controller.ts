@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Delete,
   Get,
@@ -9,6 +10,7 @@ import {
   Put,
 } from '@nestjs/common';
 import { PlayList, PlayListType } from '@prisma/client';
+import { CreatePlayListDto } from '../dtos/create-playlist.dto';
 import { CreateNewPlaylistService } from '../providers/services/create-new-playlist.service';
 import { DeletePlaylistByIdService } from '../providers/services/delete-playlist.service';
 import { FindAllPlaylistsService } from '../providers/services/find-all-playlists.service';
@@ -24,14 +26,16 @@ export class PlayListsController {
   ) {}
 
   @Post('')
-  async createOne(): Promise<PlayList> {
+  async createOne(
+    @Body() createPlaylistDto: CreatePlayListDto,
+  ): Promise<PlayList> {
     return await this.createNewPlaylist.execute({
       type: PlayListType.CASUAL,
-      name: 'tEST',
+      name: createPlaylistDto.name,
       externalId: 'DSAJK32918',
-      maxLength: 10,
+      maxLength: createPlaylistDto.maxLength,
       songsPerUser: 3,
-      description: 'testing endpoint',
+      description: createPlaylistDto.description,
     });
   }
 
