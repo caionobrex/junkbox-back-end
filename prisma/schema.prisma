@@ -10,6 +10,10 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum StreamingService {
+  SPOTIFY
+}
+
 enum PlayListType {
   CASUAL
   BUSINESS
@@ -23,6 +27,8 @@ model User {
   ip                  String?
   password            String
   resetPasswordCode   String?
+  streamingService    StreamingService?
+  serviceAccessToken  String?
   playlists           PlayList[]
   addedSongs          Song[]
   allowDedication     Boolean   @default(true)
@@ -31,24 +37,25 @@ model User {
 }
 
 model PlayList {
-  id                  Int       @default(autoincrement()) @id
-  externalId          String
-  image               String?
-  name                String
-  type                PlayListType?
-  maxLength           Int?
-  repeat              Boolean   @default(true)
-  songsPerUser        Int?
-  description         String?
-  songs               Song[]
-  user                User?     @relation(fields: [userId], references: [id])
-  userId              Int?
-  address             Address?
-  password            String?
-  blockedWords        BlockedWord[]
-  lifetime            DateTime?
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @default(now())
+  id                    Int       @default(autoincrement()) @id
+  externalId            String
+  image                 String?
+  name                  String
+  type                  PlayListType?
+  maxLength             Int?
+  description           String?
+  songs                 Song[]
+  songsCount            Int       @default(0)
+  user                  User?     @relation(fields: [userId], references: [id])
+  userId                Int?
+  address               Address?
+  isPrivate             Boolean   @default(false)
+  password              String?
+  blockedWords          BlockedWord[]
+  lifetime              DateTime?
+  removeSongAfterPlayed Boolean   @default(false)
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @default(now())
 }
 
 model Song {
@@ -62,7 +69,6 @@ model Song {
   playlistId          Int?
   user                User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId              Int?
-  toUser              String
   anonymous           Boolean   @default(false)
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @default(now())

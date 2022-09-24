@@ -6,7 +6,10 @@ import { PlayListsRepository } from '../playlists.repository';
 export class DeletePlaylistByIdService {
   constructor(private readonly playlistsRepository: PlayListsRepository) {}
 
-  execute(id: number): Promise<PlayList> {
+  async execute(id: number, userId: number): Promise<PlayList> {
+    const playlist: PlayList = await this.playlistsRepository.findById(id);
+    if (playlist.userId !== userId)
+      throw new Error('Not allowed. You are not the host of this playlist');
     return this.playlistsRepository.deleteOne(id);
   }
 }

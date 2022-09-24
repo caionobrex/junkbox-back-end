@@ -29,12 +29,14 @@ export class AuthController {
   @Post('register')
   async register(@Body() body, @Ip() ip) {
     try {
-      return await this.registerService.execute(
-        body.email,
-        body.username,
-        body.password,
-        ip,
-      );
+      return {
+        accessToken: await this.registerService.execute(
+          body.email,
+          body.username,
+          body.password,
+          ip,
+        ),
+      };
     } catch (err) {
       throw new BadRequestException(err.message);
     }

@@ -11,7 +11,7 @@ export class PlayListsRepository {
   }
 
   findAll(): Promise<PlayList[]> {
-    return this.prisma.playList.findMany();
+    return this.prisma.playList.findMany({ include: { user: true } });
   }
 
   findById(id: number): Promise<PlayList> {
