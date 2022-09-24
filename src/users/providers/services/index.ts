@@ -1,4 +1,5 @@
 import { CreateUserService } from './create-user.service';
+import { FindAllUsersService } from './find-all-user.service';
 import { FindUserByEmailOrNameService } from './find-user-by-email-or-name.service';
 import { FindUserByEmailService } from './find-user-by-email.service';
 import { FindUserByIdService } from './find-user-by-id.service';
@@ -10,4 +11,5 @@ export default [
   FindUserByEmailOrNameService,
   FindUserByEmailService,
   FindUserByNameService,
+  FindAllUsersService,
 ];
