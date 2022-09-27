@@ -21,4 +21,8 @@ export class UsersRepository {
   findByName(name: string): Promise<User | null> {
     return this.prisma.user.findUnique({ where: { name } });
   }
+
+  findAll(): Promise<User[]> {
+    return this.prisma.user.findMany();
+  }
 }
