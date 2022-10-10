@@ -4,7 +4,7 @@ import { PlaylistsGateway } from './providers/gateways/playlists.gateway';
 import { PlayListsRepository } from './providers/playlists.repository';
 import PlaylistsServices from './providers/services';
 import { PrismaService } from 'src/prisma.service';
-import { SongsModule } from '@/songs/songs.module';
+import { SongsModule } from '@/tracks/tracks.module';
 import { JwtModule } from '@nestjs/jwt';
 
 @Module({

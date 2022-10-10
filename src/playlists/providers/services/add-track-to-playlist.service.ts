@@ -1,27 +1,26 @@
-import { SongsRepository } from '@/songs/providers/songs.repository';
+import { TracksRepository } from '@/tracks/providers/tracks.repository';
 import { Injectable } from '@nestjs/common';
-import { PlayList, Prisma, Song } from '@prisma/client';
+import { PlayList, Prisma, Track } from '@prisma/client';
 import { FindPlaylistById } from './find-playlist-by-id';
 
 @Injectable()
-export class AddSongToPlaylistService {
+export class AddTrackToPlaylistService {
   constructor(
-    private readonly songRepository: SongsRepository,
+    private readonly tracksRepository: TracksRepository,
     private readonly findPlaylistById: FindPlaylistById,
   ) {}
 
   async execute(
     playlistId: number,
-    song: Prisma.SongCreateInput,
+    song: Prisma.TrackCreateInput,
     userId: number,
-  ): Promise<Song> {
+  ): Promise<Track> {
     const playlist: PlayList = await this.findPlaylistById.execute(playlistId);
-    if (playlist.songsCount > playlist.maxLength)
+    if (playlist.tracksCount > playlist.maxLength)
       throw new Error('The playlist has reached the maximum limit.');
-    return this.songRepository.createOne({
+    return this.tracksRepository.createOne({
       ...song,
-      position: playlist.songsCount,
-      user: { connect: { id: userId } },
+      addedBy: { connect: { id: userId } },
       playlist: { connect: { id: playlistId } },
     });
   }

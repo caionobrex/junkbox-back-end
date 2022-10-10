@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { SongsRepository } from '@/songs/providers/songs.repository';
+import { TracksRepository } from '@/tracks/providers/tracks.repository';
 import { FindPlaylistById } from './find-playlist-by-id';
 import { PlayList } from '@prisma/client';
 
 @Injectable()
 export class ClearPlaylistService {
   constructor(
-    private readonly songRepository: SongsRepository,
+    private readonly tracksRepository: TracksRepository,
     private readonly findPlaylistById: FindPlaylistById,
   ) {}
 
@@ -14,6 +14,6 @@ export class ClearPlaylistService {
     const playlist: PlayList = await this.findPlaylistById.execute(playlistId);
     if (playlist.userId !== userId)
       throw new Error('Not allowed. You are not the host of this playlist');
-    await this.songRepository.deleteMany({ playlistId });
+    await this.tracksRepository.deleteMany({ playlistId });
   }
 }

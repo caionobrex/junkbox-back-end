@@ -43,7 +43,6 @@ export class PlayListsController {
     return await this.createNewPlaylist.execute({
       type: PlayListType.CASUAL,
       name: createPlaylistDto.name,
-      externalId: 'DSAJK32918',
       maxLength: createPlaylistDto.maxLength,
       user: { connect: { id: req.user.userId } },
       description: createPlaylistDto.description,
@@ -66,19 +65,19 @@ export class PlayListsController {
     return '';
   }
 
-  @Patch(':id/songs/:id/upvote')
-  upvoteSong(): Promise<string> {
-    return Promise.resolve('upvote song in a given playlist');
+  @Patch(':id/tracks/:id/upvote')
+  upvoteTrack(): Promise<string> {
+    return Promise.resolve('upvote Track in a given playlist');
   }
 
-  @Delete(':id/songs/:id')
-  deleteSongById(): Promise<string> {
-    return Promise.resolve('delete song in a given playlist');
+  @Delete(':id/tracks/:id')
+  deleteTrackById(): Promise<string> {
+    return Promise.resolve('delete Track in a given playlist');
   }
 
-  @Delete(':id/songs')
-  deleteAllSongs(): Promise<string> {
-    return Promise.resolve('delete all songs in a given playlist');
+  @Delete(':id/tracks')
+  deleteAllTracks(): Promise<string> {
+    return Promise.resolve('delete all Tracks in a given playlist');
   }
 
   @UseGuards(JwtAuthGuard)
