@@ -30,44 +30,43 @@ model User {
   streamingService    StreamingService?
   serviceAccessToken  String?
   playlists           PlayList[]
-  addedSongs          Song[]
+  addedTracks         Track[]
   allowDedication     Boolean   @default(true)
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @default(now())
 }
 
 model PlayList {
-  id                    Int       @default(autoincrement()) @id
-  externalId            String
-  image                 String?
-  name                  String
-  type                  PlayListType?
-  maxLength             Int?
-  description           String?
-  songs                 Song[]
-  songsCount            Int       @default(0)
-  user                  User?     @relation(fields: [userId], references: [id])
-  userId                Int?
-  address               Address?
-  isPrivate             Boolean   @default(false)
-  password              String?
-  blockedWords          BlockedWord[]
-  lifetime              DateTime?
-  removeSongAfterPlayed Boolean   @default(false)
-  createdAt             DateTime  @default(now())
-  updatedAt             DateTime  @default(now())
+  id                      Int       @default(autoincrement()) @id
+  externalId              String
+  image                   String?
+  name                    String
+  type                    PlayListType?
+  maxLength               Int?
+  description             String?
+  tracks                  Track[]
+  tracksCount             Int       @default(0)
+  user                    User?     @relation(fields: [userId], references: [id])
+  userId                  Int?
+  address                 Address?
+  isPrivate               Boolean   @default(false)
+  password                String?
+  blockedWords            BlockedWord[]
+  lifetime                DateTime?
+  removeTrackAfterPlayed  Boolean   @default(false)
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @default(now())
 }
 
-model Song {
+model Track {
   id                  Int       @default(autoincrement()) @id
   externalId          String
   name                String
-  position            Int
   duration            Int
   upvoteCount         Int       @default(0)
   playlist            PlayList? @relation(fields: [playlistId], references: [id], onDelete: Cascade)
   playlistId          Int?
-  user                User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  addedBy             User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId              Int?
   anonymous           Boolean   @default(false)
   createdAt           DateTime  @default(now())

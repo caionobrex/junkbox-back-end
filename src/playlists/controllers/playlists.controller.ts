@@ -4,6 +4,7 @@ import {
   Controller,
   Delete,
   Get,
+  Inject,
   Param,
   ParseIntPipe,
   Patch,
@@ -11,8 +12,10 @@ import {
   Put,
   Request,
   UseGuards,
+  CACHE_MANAGER,
 } from '@nestjs/common';
 import { PlayList, PlayListType } from '@prisma/client';
+import { Cache } from 'cache-manager';
 import { Request as ExpressRequest } from 'express';
 import { CreatePlayListDto } from '../dtos/create-playlist.dto';
 import { CreateNewPlaylistService } from '../providers/services/create-new-playlist.service';
@@ -27,6 +30,7 @@ export class PlayListsController {
     private readonly findAllPlaylists: FindAllPlaylistsService,
     private readonly findPlaylistById: FindPlaylistById,
     private readonly deletePlaylistById: DeletePlaylistByIdService,
+    @Inject(CACHE_MANAGER) private readonly chacheManager: Cache,
   ) {}
 
   @UseGuards(JwtAuthGuard)
