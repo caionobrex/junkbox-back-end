@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { TracksRepository } from '@/tracks/providers/tracks.repository';
-import { FindPlaylistById } from './find-playlist-by-id';
+import { FindPlaylistById } from './find-playlist-by-id.service';
 import { PlayList } from '@prisma/client';
 
 @Injectable()

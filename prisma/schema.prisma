@@ -31,6 +31,7 @@ model User {
   serviceAccessToken  String?
   playlists           PlayList[]
   addedTracks         Track[]
+  upVotes             UpVote[]
   allowDedication     Boolean   @default(true)
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @default(now())
@@ -63,6 +64,7 @@ model Track {
   name                String
   duration            Int
   upvoteCount         Int       @default(0)
+  upVotes             UpVote[]
   playlist            PlayList? @relation(fields: [playlistId], references: [id], onDelete: Cascade)
   playlistId          Int?
   addedBy             User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -70,6 +72,14 @@ model Track {
   anonymous           Boolean   @default(false)
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @default(now())
+}
+
+model UpVote {
+  id      Int       @default(autoincrement()) @id
+  by      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId  Int
+  track   Track     @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  trackId Int
 }
 
 model BlockedWord {

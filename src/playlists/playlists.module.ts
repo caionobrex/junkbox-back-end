@@ -4,8 +4,9 @@ import { PlaylistsGateway } from './providers/gateways/playlists.gateway';
 import { PlayListsRepository } from './providers/playlists.repository';
 import PlaylistsServices from './providers/services';
 import { PrismaService } from 'src/prisma.service';
-import { SongsModule } from '@/tracks/tracks.module';
+import { TracksModule } from '@/tracks/tracks.module';
 import { JwtModule } from '@nestjs/jwt';
+import { YoutubeModule } from '@/shared/youtube/youtube.module';
 
 @Module({
   controllers: [PlayListsController],
@@ -17,7 +18,8 @@ import { JwtModule } from '@nestjs/jwt';
   ],
   imports: [
     CacheModule.register(),
-    SongsModule,
+    TracksModule,
+    YoutubeModule,
     JwtModule.register({
       secret: 'testing',
       signOptions: { expiresIn: '30m' },

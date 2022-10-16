@@ -20,8 +20,9 @@ import { Request as ExpressRequest } from 'express';
 import { CreatePlayListDto } from '../dtos/create-playlist.dto';
 import { CreateNewPlaylistService } from '../providers/services/create-new-playlist.service';
 import { DeletePlaylistByIdService } from '../providers/services/delete-playlist.service';
+import { FindAllPlaylistTracksService } from '../providers/services/find-all-playlist-tracks';
 import { FindAllPlaylistsService } from '../providers/services/find-all-playlists.service';
-import { FindPlaylistById } from '../providers/services/find-playlist-by-id';
+import { FindPlaylistById } from '../providers/services/find-playlist-by-id.service';
 
 @Controller('playlists')
 export class PlayListsController {
@@ -30,6 +31,7 @@ export class PlayListsController {
     private readonly findAllPlaylists: FindAllPlaylistsService,
     private readonly findPlaylistById: FindPlaylistById,
     private readonly deletePlaylistById: DeletePlaylistByIdService,
+    private readonly findAllPlaylistTracks: FindAllPlaylistTracksService,
     @Inject(CACHE_MANAGER) private readonly chacheManager: Cache,
   ) {}
 
@@ -58,6 +60,11 @@ export class PlayListsController {
   @Get(':id')
   async findById(@Param('id', new ParseIntPipe()) id: number) {
     return await this.findPlaylistById.execute(id);
+  }
+
+  @Get(':id/tracks')
+  async findTracks(@Param('id', new ParseIntPipe()) id: number) {
+    return await this.findAllPlaylistTracks.execute(id);
   }
 
   @Put(':id')

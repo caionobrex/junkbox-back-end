@@ -13,6 +13,8 @@ import { Cache } from 'cache-manager';
 import { PlayList, Track } from '@prisma/client';
 import { AddTrackToPlaylistService } from '../services/add-track-to-playlist.service';
 import { RemoveTrackFromPlaylistService } from '../services/remove-track-from-playlist.service';
+import { UpVoteTrackService } from '@/tracks/providers/services/up-vote-track.service';
+import { FindVideoByIdService } from '@/shared/youtube/providers/services/find-video-by-id';
 
 @WebSocketGateway({ cors: true })
 export class PlaylistsGateway {
@@ -23,6 +25,8 @@ export class PlaylistsGateway {
     private readonly playListsRepository: PlayListsRepository,
     private readonly AddTrackToPlaylist: AddTrackToPlaylistService,
     private readonly removeTrackFromPlaylist: RemoveTrackFromPlaylistService,
+    private readonly findVideoById: FindVideoByIdService,
+    private readonly upVoteTrack: UpVoteTrackService,
     private readonly jwtService: JwtService,
     @Inject(CACHE_MANAGER) private readonly chacheManager: Cache,
   ) {}
@@ -57,14 +61,15 @@ export class PlaylistsGateway {
     const payload = await this.jwtService.verifyAsync(
       client.handshake.headers.authorization,
     );
+    // TODO - check if user is authenticated
     const playlist: PlayList = await this.playListsRepository.findById(
       +playlistId,
     );
-    // TODO - make request data api and retrieve data
+    await this.findVideoById.execute(externalId);
     const track: Track = await this.AddTrackToPlaylist.execute(
       +playlistId,
       {
-        externalId: 'VHoT4N43jK8',
+        externalId: externalId,
         name: 'Stromae - Alors On Danse (Official Music Video)',
         duration: 1000 * 30,
       },
@@ -74,13 +79,42 @@ export class PlaylistsGateway {
   }
 
   @SubscribeMessage('removeTrack')
-  async handleRemoveTrack(): Promise<void> {
-    this.removeTrackFromPlaylist.execute(1, 2);
+  async handleRemoveTrack(
+    @ConnectedSocket() client: Socket,
+    @MessageBody('trackId') trackId: number,
+    @MessageBody('playlistId') playlistId: number,
+  ): Promise<void> {
+    const payload = await this.jwtService.verifyAsync(
+      client.handshake.headers.authorization,
+    );
+    const playlist: PlayList = await this.playListsRepository.findById(
+      +playlistId,
+    );
+    await this.removeTrackFromPlaylist.execute(
+      +trackId,
+      +playlistId,
+      payload.id,
+    );
+    this.server.to(playlist.name).emit('removeTrack', trackId);
   }
 
   @SubscribeMessage('upVoteTrack')
-  handleUpVoteTrack() {
-    return 'testing';
+  async handleUpVoteTrack(
+    @ConnectedSocket() client: Socket,
+    @MessageBody('playlistId') playlistId: number,
+    @MessageBody('trackId') trackId: number,
+  ): Promise<void> {
+    const payload = await this.jwtService.verifyAsync(
+      client.handshake.headers.authorization,
+    );
+    const playlist: PlayList = await this.playListsRepository.findById(
+      +playlistId,
+    );
+    const newUpVoteCount = await this.upVoteTrack.execute(
+      +trackId,
+      +payload.id,
+    );
+    this.server.to(playlist.name).emit('upVoteTrack', trackId, newUpVoteCount);
   }
 
   @SubscribeMessage('trackReachedEnd')

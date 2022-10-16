@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PlayList, Prisma } from '@prisma/client';
+import { PlayList, Prisma, Track } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 
 @Injectable()
@@ -17,7 +17,14 @@ export class PlayListsRepository {
   findById(id: number): Promise<PlayList> {
     return this.prisma.playList.findUnique({
       where: { id },
-      include: { tracks: { include: { addedBy: true } } },
+      include: { tracks: { include: { addedBy: true, upVotes: true } } },
+    });
+  }
+
+  findAllTracks(playlistId: number): Promise<Track[]> {
+    return this.prisma.track.findMany({
+      where: { playlistId },
+      include: { addedBy: true, upVotes: true },
     });
   }
 
