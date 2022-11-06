@@ -14,11 +14,6 @@ enum StreamingService {
   SPOTIFY
 }
 
-enum PlayListType {
-  CASUAL
-  BUSINESS
-}
-
 model User {
   id                  Int       @default(autoincrement()) @id
   email               String    @unique
@@ -41,19 +36,15 @@ model PlayList {
   id                      Int       @default(autoincrement()) @id
   image                   String?
   name                    String
-  type                    PlayListType?
   maxLength               Int?
   description             String?
   tracks                  Track[]
   tracksCount             Int       @default(0)
   user                    User?     @relation(fields: [userId], references: [id])
   userId                  Int?
-  address                 Address?
   isPrivate               Boolean   @default(false)
   password                String?
-  blockedWords            BlockedWord[]
-  lifetime                DateTime?
-  removeTrackAfterPlayed  Boolean   @default(false)
+  blackList               BlackList?
   createdAt               DateTime  @default(now())
   updatedAt               DateTime  @default(now())
 }
@@ -82,20 +73,35 @@ model UpVote {
   trackId Int
 }
 
-model BlockedWord {
-  id          Int       @default(autoincrement()) @id
-  word        String
-  playlist    PlayList? @relation(fields: [playlistId], references: [id])
-  playlistId  Int?
+model Word {
+  id            Int @default(autoincrement()) @id
+  value         String
+  wordPackages  WordsOnWordPackages[]
+  blackList     BlackList @relation(fields: [blackListId], references: [id])
+  blackListId   Int
 }
 
-model Address {
-  id        Int      @default(autoincrement()) @id
-  street    String?
-  district  String?
-  state     String?
-  city      String?
-  country   String?
-  playlist  PlayList @relation(fields: [addressId], references: [id])
-  addressId Int      @unique
+model WordPackage {
+  id          Int @default(autoincrement()) @id
+  title       String
+  words       WordsOnWordPackages[]
+  blackList   BlackList @relation(fields: [blackListId], references: [id])
+  blackListId Int
+}
+
+model WordsOnWordPackages {
+  word          Word @relation(fields: [wordId], references: [id])
+  wordId        Int
+  wordPackage   WordPackage @relation(fields: [wordPackageId], references: [id])
+  wordPackageId Int
+
+  @@id([wordId, wordPackageId])
+}
+
+model BlackList {
+  id          Int       @default(autoincrement()) @id
+  words       Word[]
+  wordPackage WordPackage[]
+  playlist    PlayList @relation(fields: [playlistId], references: [id], onDelete: Cascade)
+  playlistId  Int @unique
 }

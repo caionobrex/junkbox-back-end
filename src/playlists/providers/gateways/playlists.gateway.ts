@@ -62,6 +62,7 @@ export class PlaylistsGateway {
       client.handshake.headers.authorization,
     );
     // TODO - check if user is authenticated
+    // TODO - get song transcription and check if song contains some word that is blacklisted
     const playlist: PlayList = await this.playListsRepository.findById(
       +playlistId,
     );

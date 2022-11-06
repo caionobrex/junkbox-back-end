@@ -1,13 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Prisma, User } from '@prisma/client';
-import { UsersRepository } from '../users.repository';
+import { IUsersRepository } from '../users.repository';
 import { FindUserByEmailService } from './find-user-by-email.service';
 import { FindUserByNameService } from './find-user-by-name.service';
 
 @Injectable()
 export class CreateUserService {
   constructor(
-    private readonly usersRepository: UsersRepository,
+    @Inject('IUsersRepository')
+    private readonly usersRepository: IUsersRepository,
     private readonly findUserByEmail: FindUserByEmailService,
     private readonly findUserByName: FindUserByNameService,
   ) {}

@@ -14,7 +14,7 @@ import {
   UseGuards,
   CACHE_MANAGER,
 } from '@nestjs/common';
-import { PlayList, PlayListType } from '@prisma/client';
+import { PlayList } from '@prisma/client';
 import { Cache } from 'cache-manager';
 import { Request as ExpressRequest } from 'express';
 import { CreatePlayListDto } from '../dtos/create-playlist.dto';
@@ -43,9 +43,10 @@ export class PlayListsController {
     @Body() createPlaylistDto: CreatePlayListDto,
   ): Promise<PlayList> {
     return await this.createNewPlaylist.execute({
-      type: PlayListType.CASUAL,
       name: createPlaylistDto.name,
       maxLength: createPlaylistDto.maxLength,
+      isPrivate: createPlaylistDto.isPrivate || false,
+      password: createPlaylistDto.password,
       user: { connect: { id: req.user.userId } },
       description: createPlaylistDto.description,
     });

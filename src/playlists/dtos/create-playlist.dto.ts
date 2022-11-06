@@ -1,4 +1,11 @@
-import { IsString, Length, IsOptional, IsInt, Min } from 'class-validator';
+import {
+  IsString,
+  Length,
+  IsOptional,
+  IsInt,
+  Min,
+  IsBoolean,
+} from 'class-validator';
 
 export class CreatePlayListDto {
   @IsString()
@@ -12,4 +19,12 @@ export class CreatePlayListDto {
   @IsInt()
   @Min(1)
   maxLength: number;
+
+  @IsBoolean()
+  @IsOptional()
+  isPrivate: boolean;
+
+  @IsString()
+  @IsOptional()
+  password: string;
 }
