@@ -20,7 +20,7 @@ import { Request as ExpressRequest } from 'express';
 import { CreatePlayListDto } from '../dtos/create-playlist.dto';
 import { CreateNewPlaylistService } from '../providers/services/create-new-playlist.service';
 import { DeletePlaylistByIdService } from '../providers/services/delete-playlist.service';
-import { FindAllPlaylistTracksService } from '../providers/services/find-all-playlist-tracks';
+import { FindAllPlaylistTracksService } from '../providers/services/find-all-playlist-tracks.service';
 import { FindAllPlaylistsService } from '../providers/services/find-all-playlists.service';
 import { FindPlaylistById } from '../providers/services/find-playlist-by-id.service';
 

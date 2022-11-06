@@ -10,10 +10,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum StreamingService {
-  SPOTIFY
-}
-
 model User {
   id                  Int       @default(autoincrement()) @id
   email               String    @unique
@@ -22,8 +18,6 @@ model User {
   ip                  String?
   password            String
   resetPasswordCode   String?
-  streamingService    StreamingService?
-  serviceAccessToken  String?
   playlists           PlayList[]
   addedTracks         Track[]
   upVotes             UpVote[]
