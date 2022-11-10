@@ -13,7 +13,7 @@ import { ValidateUserService } from './providers/services/validate-user.service'
     UsersModule,
     JwtModule.register({
       secret: 'testing',
-      signOptions: { expiresIn: '30m' },
+      signOptions: { expiresIn: '12h' },
     }),
   ],
   controllers: [AuthController],

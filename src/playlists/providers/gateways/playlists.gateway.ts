@@ -15,6 +15,7 @@ import { AddTrackToPlaylistService } from '../services/add-track-to-playlist.ser
 import { RemoveTrackFromPlaylistService } from '../services/remove-track-from-playlist.service';
 import { UpVoteTrackService } from '@/tracks/providers/services/up-vote-track.service';
 import { FindVideoByIdService } from '@/shared/youtube/providers/services/find-video-by-id';
+import { HttpService } from '@nestjs/axios';
 
 @WebSocketGateway({ cors: true })
 export class PlaylistsGateway {
@@ -28,6 +29,7 @@ export class PlaylistsGateway {
     private readonly findVideoById: FindVideoByIdService,
     private readonly upVoteTrack: UpVoteTrackService,
     private readonly jwtService: JwtService,
+    private readonly httpService: HttpService,
     @Inject(CACHE_MANAGER) private readonly chacheManager: Cache,
   ) {}
 
@@ -58,25 +60,32 @@ export class PlaylistsGateway {
     @MessageBody('playlistId') playlistId: number,
     @MessageBody('externalId') externalId: string,
   ): Promise<void> {
-    const payload = await this.jwtService.verifyAsync(
-      client.handshake.headers.authorization,
-    );
-    // TODO - check if user is authenticated
-    // TODO - get song transcription and check if song contains some word that is blacklisted
-    const playlist: PlayList = await this.playListsRepository.findById(
-      +playlistId,
-    );
-    await this.findVideoById.execute(externalId);
-    const track: Track = await this.AddTrackToPlaylist.execute(
-      +playlistId,
-      {
-        externalId: externalId,
-        name: 'Stromae - Alors On Danse (Official Music Video)',
-        duration: 1000 * 30,
-      },
-      payload.id,
-    );
-    this.server.to(playlist.name).emit('addTrack', track);
+    try {
+      const payload = await this.jwtService.verifyAsync(
+        client.handshake.headers.authorization,
+      );
+      const { data } = await this.httpService.axiosRef.get(
+        `${process.env.GOOGLE_BASEURL}/youtube/v3/videos?part=snippet&id=${externalId}&key=${process.env.GOOGLE_API_KEY}`,
+      );
+      // TODO - check if user is authenticated
+      // TODO - get song transcription and check if song contains some word that is blacklisted
+      // TODO - convert song length to seconds
+      const playlist: PlayList = await this.playListsRepository.findById(
+        +playlistId,
+      );
+      const track: Track = await this.AddTrackToPlaylist.execute(
+        +playlistId,
+        {
+          externalId: externalId,
+          name: data.items[0].snippet.title,
+          duration: 1000 * 30,
+        },
+        payload.id,
+      );
+      this.server.to(playlist.name).emit('addTrack', track);
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   @SubscribeMessage('removeTrack')

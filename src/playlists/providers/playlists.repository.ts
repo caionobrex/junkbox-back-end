@@ -15,16 +15,14 @@ export class PlayListsRepository {
   }
 
   findById(id: number): Promise<PlayList> {
-    return this.prisma.playList.findUnique({
-      where: { id },
-      include: { tracks: { include: { addedBy: true, upVotes: true } } },
-    });
+    return this.prisma.playList.findUnique({ where: { id } });
   }
 
   findAllTracks(playlistId: number): Promise<Track[]> {
     return this.prisma.track.findMany({
       where: { playlistId },
       include: { addedBy: true, upVotes: true },
+      orderBy: { upvoteCount: 'desc' },
     });
   }
 

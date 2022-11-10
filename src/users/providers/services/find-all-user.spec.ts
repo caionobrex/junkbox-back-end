@@ -31,8 +31,6 @@ class UsersRepositoryMock implements IUsersRepository {
       id: 1,
       updatedAt: new Date('11/05/2022'),
       resetPasswordCode: '',
-      serviceAccessToken: '',
-      streamingService: 'SPOTIFY',
     };
     return Promise.resolve([user]);
   }
@@ -57,8 +55,6 @@ describe('FindAllUsersService', () => {
           id: 1,
           updatedAt: new Date('11/05/2022'),
           resetPasswordCode: '',
-          serviceAccessToken: '',
-          streamingService: 'SPOTIFY',
         },
       ];
       expect(await findAllUserService.execute()).toStrictEqual(result);

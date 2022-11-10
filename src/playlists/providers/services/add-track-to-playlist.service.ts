@@ -15,6 +15,7 @@ export class AddTrackToPlaylistService {
     track: Prisma.TrackCreateInput,
     userId: number,
   ): Promise<Track> {
+    // TODO - WHAT HAPPENS IF THE USER TRY TO ADD THE SAME MUSIC TO PLAYLIST
     if (await this.hasPlaylistReachedMaxLimit(playlistId))
       throw new Error('The playlist has reached the maximum limit.');
     await this.incrementPlaylistTracksCount(playlistId);
