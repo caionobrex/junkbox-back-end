@@ -5,6 +5,7 @@ import { DeletePlaylistByIdService } from './delete-playlist.service';
 import { AddTrackToPlaylistService } from './add-track-to-playlist.service';
 import { RemoveTrackFromPlaylistService } from './remove-track-from-playlist.service';
 import { FindAllPlaylistTracksService } from './find-all-playlist-tracks.service';
+import { DeleteTrackFromPlaylistService } from './delete-track-from-playlist.service';
 
 export default [
   CreateNewPlaylistService,
@@ -14,4 +15,5 @@ export default [
   AddTrackToPlaylistService,
   RemoveTrackFromPlaylistService,
   FindAllPlaylistTracksService,
+  DeleteTrackFromPlaylistService,
 ];

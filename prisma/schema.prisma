@@ -29,7 +29,7 @@ model User {
 model PlayList {
   id                      Int       @default(autoincrement()) @id
   image                   String?
-  name                    String
+  name                    String    @unique
   maxLength               Int?
   description             String?
   tracks                  Track[]
@@ -47,6 +47,7 @@ model Track {
   id                  Int       @default(autoincrement()) @id
   externalId          String
   name                String
+  image               String?
   duration            Int
   upvoteCount         Int       @default(0)
   upVotes             UpVote[]

@@ -11,7 +11,10 @@ export class PlayListsRepository {
   }
 
   findAll(): Promise<PlayList[]> {
-    return this.prisma.playList.findMany({ include: { user: true } });
+    return this.prisma.playList.findMany({
+      include: { user: true },
+      orderBy: { id: 'desc' },
+    });
   }
 
   findById(id: number): Promise<PlayList> {
@@ -26,6 +29,13 @@ export class PlayListsRepository {
     });
   }
 
+  findTrackByExternalId(
+    externalId: string,
+    playlistId: number,
+  ): Promise<Track | null> {
+    return this.prisma.track.findFirst({ where: { externalId, playlistId } });
+  }
+
   updateOne(
     id: number,
     playList: Prisma.PlayListUpdateInput,
@@ -35,5 +45,9 @@ export class PlayListsRepository {
 
   deleteOne(id: number): Promise<PlayList> {
     return this.prisma.playList.delete({ where: { id } });
+  }
+
+  deleteTrack(id: number): Promise<Track> {
+    return this.prisma.track.delete({ where: { id } });
   }
 }

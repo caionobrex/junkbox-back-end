@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import {
   SubscribeMessage,
   WebSocketGateway,
@@ -12,10 +13,13 @@ import { CACHE_MANAGER, Inject } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 import { PlayList, Track } from '@prisma/client';
 import { AddTrackToPlaylistService } from '../services/add-track-to-playlist.service';
-import { RemoveTrackFromPlaylistService } from '../services/remove-track-from-playlist.service';
 import { UpVoteTrackService } from '@/tracks/providers/services/up-vote-track.service';
-import { FindVideoByIdService } from '@/shared/youtube/providers/services/find-video-by-id';
 import { HttpService } from '@nestjs/axios';
+import { DeleteTrackFromPlaylistService } from '../services/delete-track-from-playlist.service';
+const dayjs = require('dayjs');
+const duration = require('dayjs/plugin/duration');
+
+dayjs.extend(duration);
 
 @WebSocketGateway({ cors: true })
 export class PlaylistsGateway {
@@ -24,10 +28,9 @@ export class PlaylistsGateway {
 
   constructor(
     private readonly playListsRepository: PlayListsRepository,
-    private readonly AddTrackToPlaylist: AddTrackToPlaylistService,
-    private readonly removeTrackFromPlaylist: RemoveTrackFromPlaylistService,
-    private readonly findVideoById: FindVideoByIdService,
+    private readonly addTrackToPlaylist: AddTrackToPlaylistService,
     private readonly upVoteTrack: UpVoteTrackService,
+    private readonly deleteTrackFromPlaylist: DeleteTrackFromPlaylistService,
     private readonly jwtService: JwtService,
     private readonly httpService: HttpService,
     @Inject(CACHE_MANAGER) private readonly chacheManager: Cache,
@@ -65,20 +68,22 @@ export class PlaylistsGateway {
         client.handshake.headers.authorization,
       );
       const { data } = await this.httpService.axiosRef.get(
-        `${process.env.GOOGLE_BASEURL}/youtube/v3/videos?part=snippet&id=${externalId}&key=${process.env.GOOGLE_API_KEY}`,
+        `${process.env.GOOGLE_BASEURL}/youtube/v3/videos?part=snippet,contentDetails&id=${externalId}&key=${process.env.GOOGLE_API_KEY}`,
       );
       // TODO - check if user is authenticated
       // TODO - get song transcription and check if song contains some word that is blacklisted
-      // TODO - convert song length to seconds
       const playlist: PlayList = await this.playListsRepository.findById(
         +playlistId,
       );
-      const track: Track = await this.AddTrackToPlaylist.execute(
+      const track: Track = await this.addTrackToPlaylist.execute(
         +playlistId,
         {
           externalId: externalId,
           name: data.items[0].snippet.title,
-          duration: 1000 * 30,
+          image: data.items[0].snippet.thumbnails.medium.url,
+          duration: dayjs
+            .duration(data.items[0].contentDetails.duration)
+            .asSeconds(),
         },
         payload.id,
       );
@@ -88,24 +93,16 @@ export class PlaylistsGateway {
     }
   }
 
-  @SubscribeMessage('removeTrack')
+  @SubscribeMessage('deleteTrack')
   async handleRemoveTrack(
-    @ConnectedSocket() client: Socket,
-    @MessageBody('trackId') trackId: number,
     @MessageBody('playlistId') playlistId: number,
+    @MessageBody('trackId') trackId: number,
   ): Promise<void> {
-    const payload = await this.jwtService.verifyAsync(
-      client.handshake.headers.authorization,
-    );
     const playlist: PlayList = await this.playListsRepository.findById(
-      +playlistId,
+      playlistId,
     );
-    await this.removeTrackFromPlaylist.execute(
-      +trackId,
-      +playlistId,
-      payload.id,
-    );
-    this.server.to(playlist.name).emit('removeTrack', trackId);
+    await this.deleteTrackFromPlaylist.execute(playlistId, trackId);
+    this.server.to(playlist.name).emit('deleteTrack', playlistId, trackId);
   }
 
   @SubscribeMessage('upVoteTrack')
@@ -125,10 +122,5 @@ export class PlaylistsGateway {
       +payload.id,
     );
     this.server.to(playlist.name).emit('upVoteTrack', trackId, newUpVoteCount);
-  }
-
-  @SubscribeMessage('trackReachedEnd')
-  handleTrackReachedEnd() {
-    // TODO - put the played music to end of the playlist
   }
 }

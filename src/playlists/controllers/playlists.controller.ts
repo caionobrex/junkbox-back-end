@@ -44,7 +44,7 @@ export class PlayListsController {
   ): Promise<PlayList> {
     return await this.createNewPlaylist.execute({
       name: createPlaylistDto.name,
-      maxLength: createPlaylistDto.maxLength,
+      maxLength: +createPlaylistDto.maxLength,
       isPrivate: createPlaylistDto.isPrivate || false,
       password: createPlaylistDto.password,
       user: { connect: { id: req.user.userId } },

@@ -15,7 +15,8 @@ export class AddTrackToPlaylistService {
     track: Prisma.TrackCreateInput,
     userId: number,
   ): Promise<Track> {
-    // TODO - WHAT HAPPENS IF THE USER TRY TO ADD THE SAME MUSIC TO PLAYLIST
+    if (await this.playlistHasTrack(track.externalId, playlistId))
+      throw new Error('The playlist already contains the track');
     if (await this.hasPlaylistReachedMaxLimit(playlistId))
       throw new Error('The playlist has reached the maximum limit.');
     await this.incrementPlaylistTracksCount(playlistId);
@@ -24,6 +25,16 @@ export class AddTrackToPlaylistService {
       addedBy: { connect: { id: userId } },
       playlist: { connect: { id: playlistId } },
     });
+  }
+
+  private async playlistHasTrack(
+    externalId: string,
+    playlistId: number,
+  ): Promise<boolean> {
+    return !!(await this.playlistsRepository.findTrackByExternalId(
+      externalId,
+      playlistId,
+    ));
   }
 
   private async hasPlaylistReachedMaxLimit(
