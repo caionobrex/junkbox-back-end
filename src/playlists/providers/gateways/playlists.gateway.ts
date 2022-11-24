@@ -16,6 +16,7 @@ import { AddTrackToPlaylistService } from '../services/add-track-to-playlist.ser
 import { UpVoteTrackService } from '@/tracks/providers/services/up-vote-track.service';
 import { HttpService } from '@nestjs/axios';
 import { DeleteTrackFromPlaylistService } from '../services/delete-track-from-playlist.service';
+import { TracksRepository } from '@/tracks/providers/tracks.repository';
 const dayjs = require('dayjs');
 const duration = require('dayjs/plugin/duration');
 
@@ -28,6 +29,7 @@ export class PlaylistsGateway {
 
   constructor(
     private readonly playListsRepository: PlayListsRepository,
+    private readonly tracksRepository: TracksRepository,
     private readonly addTrackToPlaylist: AddTrackToPlaylistService,
     private readonly upVoteTrack: UpVoteTrackService,
     private readonly deleteTrackFromPlaylist: DeleteTrackFromPlaylistService,
@@ -89,7 +91,7 @@ export class PlaylistsGateway {
       );
       this.server.to(playlist.name).emit('addTrack', track);
     } catch (err) {
-      this.server.to(playlist.name).emit('addTrackError', {
+      client.emit('addTrackError', {
         error: 'Essa playlist já contem essa música.',
       });
     }
@@ -128,9 +130,21 @@ export class PlaylistsGateway {
         .to(playlist.name)
         .emit('upVoteTrack', trackId, newUpVoteCount);
     } catch (err) {
-      this.server.to(playlist.name).emit('upVoteTrackError', {
+      client.emit('upVoteTrackError', {
         error: 'Voce não pode dar upvote duas vezes na mesma música.',
       });
     }
+  }
+
+  @SubscribeMessage('playTrack')
+  async playTrackHandler(
+    @MessageBody('trackId') trackId: number,
+    trackPosition: number,
+  ) {
+    const track: Track = await this.tracksRepository.findById(trackId);
+    const playlist: PlayList = await this.playListsRepository.findById(
+      track.playlistId,
+    );
+    this.server.to(playlist.name).emit('playTrack', track, trackPosition);
   }
 }
