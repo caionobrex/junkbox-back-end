@@ -63,18 +63,18 @@ export class PlaylistsGateway {
     @MessageBody('playlistId') playlistId: number,
     @MessageBody('externalId') externalId: string,
   ): Promise<void> {
+    const payload = await this.jwtService.verifyAsync(
+      client.handshake.headers.authorization,
+    );
+    const { data } = await this.httpService.axiosRef.get(
+      `${process.env.GOOGLE_BASEURL}/youtube/v3/videos?part=snippet,contentDetails&id=${externalId}&key=${process.env.GOOGLE_API_KEY}`,
+    );
+    // TODO - check if user is authenticated
+    // TODO - get song transcription and check if song contains some word that is blacklisted
+    const playlist: PlayList = await this.playListsRepository.findById(
+      +playlistId,
+    );
     try {
-      const payload = await this.jwtService.verifyAsync(
-        client.handshake.headers.authorization,
-      );
-      const { data } = await this.httpService.axiosRef.get(
-        `${process.env.GOOGLE_BASEURL}/youtube/v3/videos?part=snippet,contentDetails&id=${externalId}&key=${process.env.GOOGLE_API_KEY}`,
-      );
-      // TODO - check if user is authenticated
-      // TODO - get song transcription and check if song contains some word that is blacklisted
-      const playlist: PlayList = await this.playListsRepository.findById(
-        +playlistId,
-      );
       const track: Track = await this.addTrackToPlaylist.execute(
         +playlistId,
         {
@@ -89,7 +89,9 @@ export class PlaylistsGateway {
       );
       this.server.to(playlist.name).emit('addTrack', track);
     } catch (err) {
-      console.log(err);
+      this.server.to(playlist.name).emit('addTrackError', {
+        error: 'Essa playlist já contem essa música.',
+      });
     }
   }
 
@@ -117,10 +119,18 @@ export class PlaylistsGateway {
     const playlist: PlayList = await this.playListsRepository.findById(
       +playlistId,
     );
-    const newUpVoteCount = await this.upVoteTrack.execute(
-      +trackId,
-      +payload.id,
-    );
-    this.server.to(playlist.name).emit('upVoteTrack', trackId, newUpVoteCount);
+    try {
+      const newUpVoteCount = await this.upVoteTrack.execute(
+        +trackId,
+        +payload.id,
+      );
+      this.server
+        .to(playlist.name)
+        .emit('upVoteTrack', trackId, newUpVoteCount);
+    } catch (err) {
+      this.server.to(playlist.name).emit('upVoteTrackError', {
+        error: 'Voce não pode dar upvote duas vezes na mesma música.',
+      });
+    }
   }
 }

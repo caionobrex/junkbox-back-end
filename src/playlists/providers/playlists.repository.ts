@@ -25,7 +25,7 @@ export class PlayListsRepository {
     return this.prisma.track.findMany({
       where: { playlistId },
       include: { addedBy: true, upVotes: true },
-      orderBy: { upvoteCount: 'desc' },
+      orderBy: [{ upvoteCount: 'desc' }, { id: 'asc' }],
     });
   }
 
