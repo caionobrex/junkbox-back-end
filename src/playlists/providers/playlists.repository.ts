@@ -18,7 +18,10 @@ export class PlayListsRepository {
   }
 
   findById(id: number): Promise<PlayList> {
-    return this.prisma.playList.findUnique({ where: { id } });
+    return this.prisma.playList.findUnique({
+      where: { id },
+      include: { user: true },
+    });
   }
 
   findAllTracks(playlistId: number): Promise<Track[]> {

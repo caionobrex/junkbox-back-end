@@ -8,6 +8,7 @@ import { TracksModule } from '@/tracks/tracks.module';
 import { JwtModule } from '@nestjs/jwt';
 import { YoutubeModule } from '@/shared/youtube/youtube.module';
 import { HttpModule } from '@nestjs/axios';
+import { TracksRepository } from '@/tracks/providers/tracks.repository';
 
 @Module({
   controllers: [PlayListsController],
@@ -15,6 +16,7 @@ import { HttpModule } from '@nestjs/axios';
     PrismaService,
     ...PlaylistsServices,
     PlayListsRepository,
+    TracksRepository,
     PlaylistsGateway,
   ],
   imports: [
