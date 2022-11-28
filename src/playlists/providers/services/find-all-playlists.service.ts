@@ -1,10 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { PlayList } from '@prisma/client';
-import { PlayListsRepository } from '../playlists.repository';
+import { IPlayListsRepository } from '../playlists.repository';
 
 @Injectable()
 export class FindAllPlaylistsService {
-  constructor(private readonly playlistsRepository: PlayListsRepository) {}
+  constructor(
+    @Inject('IPlayListsRepository')
+    private readonly playlistsRepository: IPlayListsRepository,
+  ) {}
 
   execute(): Promise<PlayList[]> {
     return this.playlistsRepository.findAll();

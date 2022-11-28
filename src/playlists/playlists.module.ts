@@ -6,7 +6,6 @@ import PlaylistsServices from './providers/services';
 import { PrismaService } from 'src/prisma.service';
 import { TracksModule } from '@/tracks/tracks.module';
 import { JwtModule } from '@nestjs/jwt';
-import { YoutubeModule } from '@/shared/youtube/youtube.module';
 import { HttpModule } from '@nestjs/axios';
 import { TracksRepository } from '@/tracks/providers/tracks.repository';
 
@@ -14,16 +13,15 @@ import { TracksRepository } from '@/tracks/providers/tracks.repository';
   controllers: [PlayListsController],
   providers: [
     PrismaService,
-    ...PlaylistsServices,
-    PlayListsRepository,
-    TracksRepository,
+    { provide: 'ITracksRepository', useClass: TracksRepository },
     PlaylistsGateway,
+    { provide: 'IPlayListsRepository', useClass: PlayListsRepository },
+    ...PlaylistsServices,
   ],
   imports: [
     CacheModule.register(),
     HttpModule,
     TracksModule,
-    YoutubeModule,
     JwtModule.register({
       secret: 'testing',
       signOptions: { expiresIn: '30m' },

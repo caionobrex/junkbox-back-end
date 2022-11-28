@@ -1,13 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { UpVote } from '@prisma/client';
-import { TracksRepository } from '../tracks.repository';
+import { ITracksRepository } from '../tracks.repository';
 import { UpVotesRepository } from '../upvotes.repository';
 
 @Injectable()
 export class UpVoteTrackService {
   constructor(
     private readonly upVotesRepository: UpVotesRepository,
-    private readonly tracksRepository: TracksRepository,
+    @Inject('ITracksRepository')
+    private readonly tracksRepository: ITracksRepository,
   ) {}
 
   async execute(trackId: number, userId: number): Promise<number> {

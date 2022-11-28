@@ -1,12 +1,13 @@
-import { TracksRepository } from '@/tracks/providers/tracks.repository';
-import { Injectable } from '@nestjs/common';
+import { ITracksRepository } from '@/tracks/providers/tracks.repository';
+import { Inject, Injectable } from '@nestjs/common';
 import { PlayList, Track } from '@prisma/client';
 import { FindPlaylistById } from './find-playlist-by-id.service';
 
 @Injectable()
 export class RemoveTrackFromPlaylistService {
   constructor(
-    private readonly tracksRepository: TracksRepository,
+    @Inject('ITracksRepository')
+    private readonly tracksRepository: ITracksRepository,
     private readonly findPlaylistById: FindPlaylistById,
   ) {}
 

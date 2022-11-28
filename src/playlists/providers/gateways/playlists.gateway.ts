@@ -6,7 +6,7 @@ import {
   ConnectedSocket,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { PlayListsRepository } from '../playlists.repository';
+import { IPlayListsRepository } from '../playlists.repository';
 import { Socket, Server } from 'socket.io';
 import { JwtService } from '@nestjs/jwt';
 import { CACHE_MANAGER, Inject } from '@nestjs/common';
@@ -28,7 +28,9 @@ export class PlaylistsGateway {
   server: Server;
 
   constructor(
-    private readonly playListsRepository: PlayListsRepository,
+    @Inject('IPlayListsRepository')
+    private readonly playListsRepository: IPlayListsRepository,
+    @Inject('ITracksRepository')
     private readonly tracksRepository: TracksRepository,
     private readonly addTrackToPlaylist: AddTrackToPlaylistService,
     private readonly upVoteTrack: UpVoteTrackService,

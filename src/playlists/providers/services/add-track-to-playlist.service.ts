@@ -1,13 +1,15 @@
-import { TracksRepository } from '@/tracks/providers/tracks.repository';
-import { Injectable } from '@nestjs/common';
+import { ITracksRepository } from '@/tracks/providers/tracks.repository';
+import { Inject, Injectable } from '@nestjs/common';
 import { PlayList, Prisma, Track } from '@prisma/client';
-import { PlayListsRepository } from '../playlists.repository';
+import { IPlayListsRepository } from '../playlists.repository';
 
 @Injectable()
 export class AddTrackToPlaylistService {
   constructor(
-    private readonly tracksRepository: TracksRepository,
-    private readonly playlistsRepository: PlayListsRepository,
+    @Inject('ITracksRepository')
+    private readonly tracksRepository: ITracksRepository,
+    @Inject('IPlayListsRepository')
+    private readonly playlistsRepository: IPlayListsRepository,
   ) {}
 
   async execute(

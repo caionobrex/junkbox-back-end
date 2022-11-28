@@ -1,10 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { PlayList, Prisma } from '@prisma/client';
-import { PlayListsRepository } from '../playlists.repository';
+import { IPlayListsRepository } from '../playlists.repository';
 
 @Injectable()
 export class CreateNewPlaylistService {
-  constructor(private readonly playlistsRepository: PlayListsRepository) {}
+  constructor(
+    @Inject('IPlayListsRepository')
+    private readonly playlistsRepository: IPlayListsRepository,
+  ) {}
 
   async execute(playlist: Prisma.PlayListCreateInput): Promise<PlayList> {
     // TODO - Check if playlist name already exists

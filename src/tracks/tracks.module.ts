@@ -7,10 +7,13 @@ import { UpVotesRepository } from './providers/upvotes.repository';
 @Module({
   providers: [
     PrismaService,
-    TracksRepository,
     UpVotesRepository,
     UpVoteTrackService,
+    { provide: 'ITracksRepository', useClass: TracksRepository },
   ],
-  exports: [TracksRepository, UpVoteTrackService],
+  exports: [
+    { provide: 'ITracksRepository', useClass: TracksRepository },
+    UpVoteTrackService,
+  ],
 })
 export class TracksModule {}

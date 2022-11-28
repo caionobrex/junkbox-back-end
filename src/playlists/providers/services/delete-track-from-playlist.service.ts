@@ -1,10 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Track } from '@prisma/client';
-import { PlayListsRepository } from '../playlists.repository';
+import { IPlayListsRepository } from '../playlists.repository';
 
 @Injectable()
 export class DeleteTrackFromPlaylistService {
-  constructor(private readonly playlistsRepository: PlayListsRepository) {}
+  constructor(
+    @Inject('IPlayListsRepository')
+    private readonly playlistsRepository: IPlayListsRepository,
+  ) {}
 
   async execute(playlistId: number, trackId: number): Promise<Track> {
     const track: Track = await this.playlistsRepository.deleteTrack(trackId);

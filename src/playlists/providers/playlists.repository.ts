@@ -2,8 +2,32 @@ import { Injectable } from '@nestjs/common';
 import { PlayList, Prisma, Track } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 
+export interface IPlayListsRepository {
+  insertOne(playlist: Prisma.PlayListCreateInput): Promise<PlayList>;
+
+  findAll(): Promise<PlayList[]>;
+
+  findById(id: number): Promise<PlayList>;
+
+  findAllTracks(playlistId: number): Promise<Track[]>;
+
+  findTrackByExternalId(
+    externalId: string,
+    playlistId: number,
+  ): Promise<Track | null>;
+
+  updateOne(
+    id: number,
+    playList: Prisma.PlayListUpdateInput,
+  ): Promise<PlayList>;
+
+  deleteOne(id: number): Promise<PlayList>;
+
+  deleteTrack(id: number): Promise<Track>;
+}
+
 @Injectable()
-export class PlayListsRepository {
+export class PlayListsRepository implements IPlayListsRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   insertOne(playlist: Prisma.PlayListCreateInput): Promise<PlayList> {
