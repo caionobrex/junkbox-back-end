@@ -21,6 +21,10 @@ export class AddTrackToPlaylistService {
       throw new Error('The playlist already contains the track');
     if (await this.hasPlaylistReachedMaxLimit(playlistId))
       throw new Error('The playlist has reached the maximum limit.');
+    if (track.duration > 60 * 5)
+      throw new Error(
+        'The track duration is too large. It needs to be at max 5min',
+      );
     await this.incrementPlaylistTracksCount(playlistId);
     return this.tracksRepository.createOne({
       ...track,
