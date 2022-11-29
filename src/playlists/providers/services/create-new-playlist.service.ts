@@ -10,9 +10,10 @@ export class CreateNewPlaylistService {
   ) {}
 
   async execute(playlist: Prisma.PlayListCreateInput): Promise<PlayList> {
-    // TODO - Check if playlist name already exists
     if (playlist.isPrivate && !playlist.password)
       throw Error('If playlist is private, password is required!');
+    if (await this.playlistsRepository.findByName(playlist.name))
+      throw Error('This playlist name already exists!');
     return await this.playlistsRepository.insertOne(playlist);
   }
 }
