@@ -9,6 +9,8 @@ export interface IPlayListsRepository {
 
   findById(id: number): Promise<PlayList>;
 
+  findByName(name: string): Promise<PlayList | null>;
+
   findAllTracks(playlistId: number): Promise<Track[]>;
 
   findTrackByExternalId(
@@ -46,6 +48,10 @@ export class PlayListsRepository implements IPlayListsRepository {
       where: { id },
       include: { user: true },
     });
+  }
+
+  findByName(name: string): Promise<PlayList | null> {
+    return this.prisma.playList.findUnique({ where: { name } });
   }
 
   findAllTracks(playlistId: number): Promise<Track[]> {
