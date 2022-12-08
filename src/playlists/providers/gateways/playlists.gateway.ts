@@ -45,7 +45,7 @@ export class PlaylistsGateway {
     @ConnectedSocket() client: Socket,
     @MessageBody('playlistId') playlistId: number,
   ): Promise<void> {
-    this.jwtService.verifyAsync(client.handshake.headers.authorization);
+    this.jwtService.verifyAsync(client.handshake.auth.token);
     const playlist: PlayList = await this.playListsRepository.findById(
       +playlistId,
     );
@@ -68,7 +68,7 @@ export class PlaylistsGateway {
     @MessageBody('externalId') externalId: string,
   ): Promise<void> {
     const payload = await this.jwtService.verifyAsync(
-      client.handshake.headers.authorization,
+      client.handshake.auth.token,
     );
     const { data } = await this.httpService.axiosRef.get(
       `${process.env.GOOGLE_BASEURL}/youtube/v3/videos?part=snippet,contentDetails&id=${externalId}&key=${process.env.GOOGLE_API_KEY}`,
@@ -118,7 +118,7 @@ export class PlaylistsGateway {
     @MessageBody('trackId') trackId: number,
   ): Promise<void> {
     const payload = await this.jwtService.verifyAsync(
-      client.handshake.headers.authorization,
+      client.handshake.auth.token,
     );
     const playlist: PlayList = await this.playListsRepository.findById(
       +playlistId,
