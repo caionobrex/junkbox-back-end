@@ -9,7 +9,7 @@ import {
 import { IPlayListsRepository } from '../playlists.repository';
 import { Socket, Server } from 'socket.io';
 import { JwtService } from '@nestjs/jwt';
-import { CACHE_MANAGER, Inject } from '@nestjs/common';
+import { CACHE_MANAGER, Inject, UseGuards } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 import { PlayList, Track } from '@prisma/client';
 import { AddTrackToPlaylistService } from '../services/add-track-to-playlist.service';
@@ -17,6 +17,7 @@ import { UpVoteTrackService } from '@/tracks/providers/services/up-vote-track.se
 import { HttpService } from '@nestjs/axios';
 import { DeleteTrackFromPlaylistService } from '../services/delete-track-from-playlist.service';
 import { TracksRepository } from '@/tracks/providers/tracks.repository';
+import { WsJwtGuard } from '@/auth/guards/ws-jwt-auth.guard';
 const dayjs = require('dayjs');
 const duration = require('dayjs/plugin/duration');
 
@@ -41,6 +42,7 @@ export class PlaylistsGateway {
   ) {}
 
   @SubscribeMessage('joinPlaylist')
+  @UseGuards(WsJwtGuard)
   async handleJoinPlaylist(
     @ConnectedSocket() client: Socket,
     @MessageBody('playlistId') playlistId: number,
@@ -62,6 +64,7 @@ export class PlaylistsGateway {
   }
 
   @SubscribeMessage('addTrack')
+  @UseGuards(WsJwtGuard)
   async handleAddTrack(
     @ConnectedSocket() client: Socket,
     @MessageBody('playlistId') playlistId: number,
@@ -100,6 +103,7 @@ export class PlaylistsGateway {
   }
 
   @SubscribeMessage('deleteTrack')
+  @UseGuards(WsJwtGuard)
   async handleRemoveTrack(
     @MessageBody('playlistId') playlistId: number,
     @MessageBody('trackId') trackId: number,
@@ -112,6 +116,7 @@ export class PlaylistsGateway {
   }
 
   @SubscribeMessage('upVoteTrack')
+  @UseGuards(WsJwtGuard)
   async handleUpVoteTrack(
     @ConnectedSocket() client: Socket,
     @MessageBody('playlistId') playlistId: number,
@@ -139,6 +144,7 @@ export class PlaylistsGateway {
   }
 
   @SubscribeMessage('playTrack')
+  @UseGuards(WsJwtGuard)
   async playTrackHandler(
     @MessageBody('trackId') trackId: number,
     trackPosition: number,
