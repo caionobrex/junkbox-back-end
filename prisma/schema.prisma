@@ -1,0 +1,102 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                  Int       @default(autoincrement()) @id
+  email               String    @unique
+  name                String    @unique
+  avatar              String?
+  ip                  String?
+  password            String
+  resetPasswordCode   String?
+  playlists           PlayList[]
+  addedTracks         Track[]
+  upVotes             UpVote[]
+  allowDedication     Boolean   @default(true)
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @default(now())
+}
+
+model PlayList {
+  id                      Int       @default(autoincrement()) @id
+  image                   String?
+  name                    String    @unique
+  maxLength               Int?
+  description             String?
+  tracks                  Track[]
+  tracksCount             Int       @default(0)
+  user                    User?     @relation(fields: [userId], references: [id])
+  userId                  Int?
+  isPrivate               Boolean   @default(false)
+  password                String?
+  blackList               BlackList?
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @default(now())
+}
+
+model Track {
+  id                  Int       @default(autoincrement()) @id
+  externalId          String
+  name                String
+  image               String?
+  duration            Int
+  upvoteCount         Int       @default(0)
+  upVotes             UpVote[]
+  playlist            PlayList? @relation(fields: [playlistId], references: [id], onDelete: Cascade)
+  playlistId          Int?
+  addedBy             User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId              Int?
+  anonymous           Boolean   @default(false)
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @default(now())
+}
+
+model UpVote {
+  id      Int       @default(autoincrement()) @id
+  by      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId  Int
+  track   Track     @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  trackId Int
+}
+
+model Word {
+  id            Int @default(autoincrement()) @id
+  value         String
+  wordPackages  WordsOnWordPackages[]
+  blackList     BlackList @relation(fields: [blackListId], references: [id])
+  blackListId   Int
+}
+
+model WordPackage {
+  id          Int @default(autoincrement()) @id
+  title       String
+  words       WordsOnWordPackages[]
+  blackList   BlackList @relation(fields: [blackListId], references: [id])
+  blackListId Int
+}
+
+model WordsOnWordPackages {
+  word          Word @relation(fields: [wordId], references: [id])
+  wordId        Int
+  wordPackage   WordPackage @relation(fields: [wordPackageId], references: [id])
+  wordPackageId Int
+
+  @@id([wordId, wordPackageId])
+}
+
+model BlackList {
+  id          Int       @default(autoincrement()) @id
+  words       Word[]
+  wordPackage WordPackage[]
+  playlist    PlayList @relation(fields: [playlistId], references: [id], onDelete: Cascade)
+  playlistId  Int @unique
+}
