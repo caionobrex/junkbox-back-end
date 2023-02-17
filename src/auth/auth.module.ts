@@ -1,9 +1,9 @@
 import { UsersModule } from '@/users/users.module';
 import { Module } from '@nestjs/common';
-import { JwtModule, JwtService } from '@nestjs/jwt';
+import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from './controllers/auth.controller';
-import { JwtStrategy } from './jwt.strategy';
-import { LocalStrategy } from './local.strategy';
+import { JwtStrategy } from './strategies/jwt.strategy';
+import { LocalStrategy } from './strategies/local.strategy';
 import { LoginService } from './providers/services/login.service';
 import { RegisterService } from './providers/services/register.service';
 import { ValidateUserService } from './providers/services/validate-user.service';
