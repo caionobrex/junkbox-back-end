@@ -76,7 +76,6 @@ export class PlaylistsGateway {
     const { data } = await this.httpService.axiosRef.get(
       `${process.env.GOOGLE_BASEURL}/youtube/v3/videos?part=snippet,contentDetails&id=${externalId}&key=${process.env.GOOGLE_API_KEY}`,
     );
-    // TODO - check if user is authenticated
     // TODO - get song transcription and check if song contains some word that is blacklisted
     const playlist: PlayList = await this.playListsRepository.findById(
       +playlistId,
